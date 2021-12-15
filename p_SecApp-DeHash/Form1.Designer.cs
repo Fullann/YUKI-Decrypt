@@ -53,6 +53,7 @@
             // chkSpecial
             // 
             this.chkSpecial.AutoSize = true;
+            this.chkSpecial.Cursor = System.Windows.Forms.Cursors.Hand;
             this.chkSpecial.Location = new System.Drawing.Point(12, 175);
             this.chkSpecial.Name = "chkSpecial";
             this.chkSpecial.Size = new System.Drawing.Size(115, 17);
@@ -63,6 +64,7 @@
             // chkNumeric
             // 
             this.chkNumeric.AutoSize = true;
+            this.chkNumeric.Cursor = System.Windows.Forms.Cursors.Hand;
             this.chkNumeric.Location = new System.Drawing.Point(12, 152);
             this.chkNumeric.Name = "chkNumeric";
             this.chkNumeric.Size = new System.Drawing.Size(65, 17);
@@ -73,6 +75,7 @@
             // chkUpper
             // 
             this.chkUpper.AutoSize = true;
+            this.chkUpper.Cursor = System.Windows.Forms.Cursors.Hand;
             this.chkUpper.Location = new System.Drawing.Point(12, 129);
             this.chkUpper.Name = "chkUpper";
             this.chkUpper.Size = new System.Drawing.Size(98, 17);
@@ -85,6 +88,7 @@
             this.chkLower.AutoSize = true;
             this.chkLower.Checked = true;
             this.chkLower.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkLower.Cursor = System.Windows.Forms.Cursors.Hand;
             this.chkLower.Location = new System.Drawing.Point(12, 106);
             this.chkLower.Name = "chkLower";
             this.chkLower.Size = new System.Drawing.Size(95, 17);
@@ -141,6 +145,7 @@
             // 
             // btnStartResume
             // 
+            this.btnStartResume.Cursor = System.Windows.Forms.Cursors.Hand;
             this.btnStartResume.Location = new System.Drawing.Point(8, 279);
             this.btnStartResume.Name = "btnStartResume";
             this.btnStartResume.Size = new System.Drawing.Size(101, 23);
@@ -151,6 +156,7 @@
             // 
             // btnAbort
             // 
+            this.btnAbort.Cursor = System.Windows.Forms.Cursors.Hand;
             this.btnAbort.Enabled = false;
             this.btnAbort.Location = new System.Drawing.Point(115, 279);
             this.btnAbort.Name = "btnAbort";
@@ -162,6 +168,7 @@
             // 
             // btnExit
             // 
+            this.btnExit.Cursor = System.Windows.Forms.Cursors.Hand;
             this.btnExit.Location = new System.Drawing.Point(202, 279);
             this.btnExit.Name = "btnExit";
             this.btnExit.Size = new System.Drawing.Size(75, 23);
@@ -244,6 +251,7 @@
             this.Controls.Add(this.chkLower);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "DeHash";
+            this.ShowIcon = false;
             this.Text = "DeHash";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.frmMain_FormClosing);
             this.ResumeLayout(false);

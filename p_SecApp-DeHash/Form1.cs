@@ -44,7 +44,6 @@ namespace p_SecApp_DeHash
             InitializeComponent();
         }
 
-      
         /// <summary>
         /// Start
         /// </summary>
