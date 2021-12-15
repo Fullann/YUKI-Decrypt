@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Runtime.InteropServices;
-using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
@@ -25,14 +24,9 @@ namespace p_SecApp_DeHash
 
         int[] CharsToUse = new int[1];
 
-        readonly SHA256 sha256 = new SHA256Managed();
-        readonly MD5 md5 = new MD5CryptoServiceProvider();
-        readonly SHA1Managed sha1 = new SHA1Managed();
-
         string SEARCHING = "";
         string CURRENT = "";
         string CURRENTDIC = "";
-
 
         ulong PossibleCombos = 0;
         ulong AttemptsPerSecond = 0;
@@ -43,10 +37,6 @@ namespace p_SecApp_DeHash
         bool BackThreadRunning = false;
         string MessageToShow = "";
         string Password = "";
-
-
-        Byte[] originalBytes;
-        Byte[] encodedBytes;
 
         Utils.Utils.hashtype hashtype;
         public DeHash()
@@ -115,12 +105,12 @@ namespace p_SecApp_DeHash
                 }
                 SEARCHING = SEARCHING.Substring(0, SEARCHING.Length - 1);
 
-                t = new Thread(BruteForceProcess);
-                t1 = new Thread(BruteForceDictonnary);
 
+                t = new Thread(BruteForceProcess) { Name = "BruteForce" };
+                t1 = new Thread(BruteForceDictonnary) { Name = "Dictionnary" };
 
-                //t.Start();
                 t1.Start();
+                t.Start();  
             }
             else
             {
@@ -188,21 +178,22 @@ namespace p_SecApp_DeHash
         {
             string[] lines = File.ReadAllLines(Directory.GetCurrentDirectory() + $"\\Dictonnary\\dic.txt");
 
+            Utils.hash hash = new Utils.hash();
+
             foreach (string line in lines)
             {
                 switch (hashtype)
                 {
                     case Utils.Utils.hashtype.md5:
-                        CURRENTDIC = EncodeMD5(line);
+                        CURRENTDIC = hash.EncodeMD5(line);
                         break;
                     case Utils.Utils.hashtype.sha2:
-                        CURRENTDIC = EncodeSHA256(line);
+                        CURRENTDIC = hash.EncodeSHA256(line);
                         break;
                     case Utils.Utils.hashtype.sha1:
-                        CURRENTDIC = EncodeSHA1(line);
+                        CURRENTDIC = hash.EncodeSHA1(line);
                         break;
                 }
-
 
                 //Si on a le résultat
                 if (CURRENTDIC == SEARCHING)
@@ -248,18 +239,20 @@ namespace p_SecApp_DeHash
         /// </summary>
         private void UseWord()
         {
+            Utils.hash hash = new Utils.hash();
+
             //Write this word
             SB.Append(Word);
             switch (hashtype)
             {
                 case Utils.Utils.hashtype.md5:
-                    CURRENT = EncodeMD5(SB.ToString());
+                    CURRENT = hash.EncodeMD5(SB.ToString());
                     break;
                 case Utils.Utils.hashtype.sha2:
-                    CURRENT = EncodeSHA256(SB.ToString());
+                    CURRENT = hash.EncodeSHA256(SB.ToString());
                     break;
                 case Utils.Utils.hashtype.sha1:
-                    CURRENT = EncodeSHA1(SB.ToString());
+                    CURRENT = hash.EncodeSHA1(SB.ToString());
                     break;
             }
             
@@ -290,45 +283,6 @@ namespace p_SecApp_DeHash
             {
                 Word[i] = (char)CharsToUse[0];
             }
-        }
-
-        /// <summary>
-        /// Convert to MD5
-        /// </summary>
-        /// <param name="originalString"></param>
-        /// <returns></returns>
-        public string EncodeMD5(string originalString)
-        {
-            originalBytes = ASCIIEncoding.Default.GetBytes(originalString);
-            encodedBytes = md5.ComputeHash(originalBytes);
-
-            return BitConverter.ToString(encodedBytes);
-        }        
-
-        /// <summary>
-        /// Convert to SHA1
-        /// </summary>
-        /// <param name="originalString"></param>
-        /// <returns></returns>
-        public string EncodeSHA1(string originalString)
-        {
-            originalBytes = ASCIIEncoding.Default.GetBytes(originalString);
-            encodedBytes = sha1.ComputeHash(originalBytes);
-
-            return BitConverter.ToString(encodedBytes);
-        }
-
-        /// <summary>
-        /// Convert to SHA256
-        /// </summary>
-        /// <param name="originalString"></param>
-        /// <returns></returns>
-        public string EncodeSHA256(string originalString)
-        {
-            originalBytes = ASCIIEncoding.Default.GetBytes(originalString);
-            encodedBytes = sha256.ComputeHash(originalBytes);
-
-            return BitConverter.ToString(encodedBytes);
         }
 
         /// <summary>
