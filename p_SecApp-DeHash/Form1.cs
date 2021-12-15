@@ -31,6 +31,8 @@ namespace p_SecApp_DeHash
 
         string SEARCHING = "";
         string CURRENT = "";
+        string CURRENTDIC = "";
+
 
         ulong PossibleCombos = 0;
         ulong AttemptsPerSecond = 0;
@@ -40,6 +42,8 @@ namespace p_SecApp_DeHash
         bool MatchFound = false;
         bool BackThreadRunning = false;
         string MessageToShow = "";
+        string Password = "";
+
 
         Byte[] originalBytes;
         Byte[] encodedBytes;
@@ -85,39 +89,38 @@ namespace p_SecApp_DeHash
                 return;
             }
 
-            //On met en attente
-            LockForm();
-            //On crée l array de tous les caractère
-            CreateCharacterArray();
-
-            SEARCHING = "";
-           
-
-            BackThreadRunning = true;
-            MatchFound = false;
-            
-            string mashup = txtHash.Text.Trim().ToUpper();
-
-            //Séparation en groupe 
-            for (int i = 0; i < mashup.Length; i += 2)
-            {
-                SEARCHING += mashup.Substring(i, 2);
-                SEARCHING += "-";
-            }
-            SEARCHING = SEARCHING.Substring(0, SEARCHING.Length - 1);
-
             //Get hash Type
             hashtype = Utils.Utils.GetType(txtHash.Text);
 
             //Si on a trouvé le cryptage
             if (hashtype != Utils.Utils.hashtype.unknown)
             {
+                //On met en attente
+                LockForm();
+                //On crée l array de tous les caractère
+                CreateCharacterArray();
+
+                SEARCHING = "";
+
+                BackThreadRunning = true;
+                MatchFound = false;
+
+                string mashup = txtHash.Text.Trim().ToUpper();
+
+                //Séparation en groupe 
+                for (int i = 0; i < mashup.Length; i += 2)
+                {
+                    SEARCHING += mashup.Substring(i, 2);
+                    SEARCHING += "-";
+                }
+                SEARCHING = SEARCHING.Substring(0, SEARCHING.Length - 1);
+
                 t = new Thread(BruteForceProcess);
                 t1 = new Thread(BruteForceDictonnary);
 
-                //t1.Start();
 
-                t.Start();                
+                //t.Start();
+                t1.Start();
             }
             else
             {
@@ -172,42 +175,50 @@ namespace p_SecApp_DeHash
             if (BackThreadRunning == true)
                 MessageToShow = "No matching "+ hashtype.ToString() +" was found. Seconds Taken: " + secondsTaken.ToString();
             else if (BackThreadRunning == false && MatchFound == true)
-                MessageToShow = "Matching " + hashtype.ToString() + " found! Seconds Taken: " + secondsTaken.ToString();
+                MessageToShow = "Matching " + hashtype.ToString() + " found! Seconds Taken: " + secondsTaken.ToString() + ". Your password is : ";
 
             BackThreadRunning = false;
         }
 
+        /// <summary>
+        /// BruteForceDictonnary
+        /// </summary>
+        /// <param name="numDic"></param>
         private void BruteForceDictonnary()
         {
-            string[] lines = File.ReadAllLines(Directory.GetCurrentDirectory() + "\\Dictonnary\\1.txt");
+            string[] lines = File.ReadAllLines(Directory.GetCurrentDirectory() + $"\\Dictonnary\\dic.txt");
 
             foreach (string line in lines)
             {
                 switch (hashtype)
                 {
                     case Utils.Utils.hashtype.md5:
-                        CURRENT = EncodeMD5(line);
+                        CURRENTDIC = EncodeMD5(line);
                         break;
                     case Utils.Utils.hashtype.sha2:
-                        CURRENT = EncodeSHA256(line);
+                        CURRENTDIC = EncodeSHA256(line);
                         break;
                     case Utils.Utils.hashtype.sha1:
-                        CURRENT = EncodeSHA1(line);
+                        CURRENTDIC = EncodeSHA1(line);
                         break;
                 }
 
+
                 //Si on a le résultat
-                if (CURRENT == SEARCHING)
+                if (CURRENTDIC == SEARCHING)
                 {
-                    MessageToShow = line;
+                    Password = line;
                     MatchFound = true;
                     BackThreadRunning = false;
                     return;
                 }
-            }
-
-            
+            }   
         }
+
+        /// <summary>
+        /// CycleChar
+        /// </summary>
+        /// <param name="position"></param>
         private void CycleChar(int position)
         {
             if (BackThreadRunning == false)
@@ -259,6 +270,7 @@ namespace p_SecApp_DeHash
             //Si on a le résultat
             if (CURRENT == SEARCHING)
             {
+                Password = SB.ToString();
                 MatchFound = true;
                 BackThreadRunning = false;
                 return;
@@ -397,7 +409,7 @@ namespace p_SecApp_DeHash
                 {
                     txtResume.Text = SB.ToString();
                     UnlockForm();
-                    ShowMessageBox(MessageToShow);
+                    ShowMessageBox(MessageToShow + Password);
                     return;
                 }
                 //Si fin du thread
@@ -441,7 +453,6 @@ namespace p_SecApp_DeHash
                     TimeEstimate = (double)SecondsToComplete / 31536000;
                     lblStatus.Text += "\nTime to End: " + TimeEstimate.ToString("0.00") + " years";
                 }
-
                 AttemptsPerSecond = 0;
             }
             catch
@@ -539,6 +550,8 @@ namespace p_SecApp_DeHash
         private void BtnAbort_Click(object sender, EventArgs e)
         {
             t.Interrupt();
+            t1.Interrupt();
+
             BackThreadRunning = false;
             UnlockForm();
         }
